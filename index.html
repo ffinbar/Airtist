@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GPT-Generated Image</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 0;
+            gap: 1rem;
+            margin: 0;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 2rem;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            /* background-color: #007bff73; */
+            backdrop-filter: blur(5px);
+            color: black;
+            border-bottom-left-radius: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 998;
+            box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: left;
+            margin: 0;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            font-weight: normal;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 1rem;
+            padding: 0.5rem;
+            font-weight: normal;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        #input {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button, .button {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            background-color: none;
+            color: black;
+            border-radius: 1rem;
+            width: max-content;
+            gap: 0.5rem;
+            transition: filter 0.2s ease;
+            box-shadow:  -2px 2px 0.2rem rgba(0, 0, 0, 0.5);
+
+        }
+
+        button:hover:not(:disabled), .button:hover:not(:disabled), .switch:hover:not(:disabled) {
+            filter: saturate(1.5) invert(1) hue-rotate(270deg) brightness(1.2);
+        }
+
+        .red {
+            background-color: #ff0048;
+            /* darker red */
+            color: white;
+        }
+
+       
+
+        button:disabled {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+
+        }
+
+        #goBtn {
+            text-wrap: nowrap;
+        }
+
+        #goBtn:disabled, .goBtn:disabled {
+            filter: none;
+        }
+
+        #canvCont {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 0 1rem;
+            position: relative;
+            max-width: 500px;
+        }
+
+        canvas {
+            width: 100%;
+            /* border: 1px solid rgb(123, 123, 123); */
+            border-radius: 1rem;
+            max-width: 800px;
+            /* max-height: 100vh; */
+            background-color: rgb(230, 230, 230);
+            box-shadow: inset 0 0 1rem rgba(0, 0, 0, 0.5);
+        }
+
+        .fh {
+            display: flex;
+            flex-direction: column;
+
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        #legendDisplay {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            border-radius: 1rem;
+            padding: 0rem;
+            /* background-color: lightgrey; */
+            margin: 0 1rem;
+        }
+
+        .legend-item {
+            user-select: none;
+            display: flex;
+            align-items: center;
+            /* padding: .5rem; */
+            border-radius: 1rem;
+            box-shadow:  -2px 2px 0.2rem rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            background-color: white;
+            z-index: 1;
+            overflow: hidden;
+            margin: .25rem;
+        }
+
+        .lg-color {
+            width: 1.2rem;
+            height: 100%;
+        }
+
+        .lg-name {
+            padding: .25rem .5rem .25rem .25rem;
+            font-size: 1rem;
+        }
+
+        #toggles {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        #drawCharsLabel, #colourFilterLabel {
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        select {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: filter 0.2s ease;
+            max-width: 300px;
+            overflow: hidden;
+        }
+
+        select:hover {
+            cursor: pointer;
+            filter: brightness(0.9);
+        }
+
+        #inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        #suggestions {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .suggestion {
+            padding: 0.5rem;
+            font-size: 1rem;
+            background-color: white;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: filter 0.2s ease;
+        }
+
+        .suggestion:hover {
+            filter: brightness(0.9);
+        }
+
+        .custom-checkbox {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            background-color: white;
+            border: 2px solid lightgrey;
+            border-radius: 1rem;
+            position: relative;
+            cursor: pointer;
+            margin-left: .5rem;
+        }
+
+        .custom-checkbox::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: .5rem;
+            height: .5rem;
+            background-color: #ff0048;
+            border-radius: 1rem;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="checkbox"]:checked + .custom-checkbox::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Slider switch styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* div.style.display = "flex";
+        div.style.alignItems = "center";
+        div.style.margin = "5px";
+         */
+
+        #controls, .controls {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 1rem;
+            position: sticky;
+            bottom: 0;
+            z-index: 99;
+            pointer-events: none;
+            flex-wrap: wrap;
+            gap: 1rem;
+            /* margin-bottom: 1rem;
+            border-bottom: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            border-radius: 1rem; */
+        }
+
+        #ctrlRow, .ctrlRow {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        /* mobile only styles for controls only */
+
+        @media (min-width: 800px) {
+            #controls, .controls {
+                max-width: 60vw;
+            }
+        }
+
+        #controls > * {
+            pointer-events: auto;
+        }
+
+        /* blur the background of controls children */
+        #controls {
+            backdrop-filter: blur(5px);
+            /* background-color: rgba(255, 255, 255, 0.5); */
+            /* border-radius: 1rem; */
+
+        }
+
+        #mainBtns, .mainBtns {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        #newChange, .newChange {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #undoBtns, .undoBtns {
+            display: flex;
+            align-items: stretch;
+        }
+
+        /* #model {
+            padding: 0.5rem;
+            font-size: 2rem;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            background-color: white;
+            transition: filter 0.2s ease;
+        } */
+
+         /* Loading spinner styles */
+        #loadingOverlay {
+            /* display: none; */
+            display: flex;
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            width: calc(100% - 2rem);
+            border-radius: 1rem;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            margin: 0 auto;
+        }
+
+        #loadingEmojis {
+            font-size: 3rem;
+            display: flex;
+            position: relative;
+            gap: 2rem;
+
+        }
+
+        #brush {
+            position: absolute;
+            animation: brush 1s infinite ease;
+            transform-origin: top right;
+            right: 2.5rem;
+            top: 2rem;
+            width: 2rem;
+            height: 2rem;
+            z-index: 10;
+        }
+
+        @keyframes brush {
+            0% {
+                transform: rotateZ(90deg) translateY(-0.5rem);
+            }
+            50% {
+                transform: rotateZ(45deg) translateY(0.5rem);
+            }
+            100% {
+                transform: rotateZ(90deg) translateY(-0.5rem);
+            }
+        }
+
+        #painting {
+            animation: painting 1s infinite ease;
+            transform-origin: center;
+        }
+
+        @keyframes painting {
+            0% {
+                transform: rotateZ(-10deg);
+            }
+            50% {
+                transform: rotateZ(10deg);
+            }
+            100% {
+                transform: rotateZ(-10deg);
+            }
+        }
+
+        #bot {
+            animation: bot 1s infinite ease;
+            transform-origin: center;
+            z-index: 9;
+        }
+
+        @keyframes bot {
+            0% {
+                transform: translateY(-0.5rem) rotateZ(10deg);
+            }
+            50% {
+                transform: translateY(0rem) rotateZ(-10deg);
+            }
+            100% {
+                transform: translateY(-0.5rem) rotateZ(10deg);
+            }
+        }
+
+        #spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #007bff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #infoOverlay {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            top: 0;
+            right: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            margin: 0 auto;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        #infoContent {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        #infoContent h2 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        #infoContent > .controls {
+            position: unset;
+            pointer-events: auto;
+        }
+
+        .emojiBtn {
+            background: none;
+            box-shadow: none;
+            border-radius: 0;
+            color: black;
+            padding: 0;
+            font-size: 3rem;
+        }
+
+        .emojiBtn:disabled {
+            filter: brightness(.5);
+            background: none;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AIrtist</h1>
+    </header>
+    <section id="infoOverlay">
+        <article id="infoContent">
+            <h2>Welcome to AIrtist</h2>
+            <p>Use the controls an text box to generate AI images.<br><br>
+            The AI will generate an image based on your description, and you can modify it by changing the description and re-generating the image.<br><br>
+            Images created by the AI are represented as a grid of tiles, each with a text character representing a color.<br><br>
+            This means we can use a text-based format to represent images, and the AI can generate images based on this format.<br><br>
+            </p>
+            <h2>Controls:</h2>
+            <span class="controlDesc">Click a button to see its description</span>
+            <div class="controls">
+                <div id="ctrlRow">
+                        <button class="model emojiBtn" onclick="controlInfo('model')">⚡</button>
+                        <button class="saveImage emojiBtn" onclick="controlInfo('save')">💾</button>
+                        <div class="undoBtns">
+                            <button class="undoBtn emojiBtn" onclick="controlInfo('undo')">⏪</button>
+                            <button class="redoBtn emojiBtn" onclick="controlInfo('redo')">⏩</button>
+                        </div>
+                            <button class="changeBtn emojiBtn" onclick="controlInfo('modify')">📝</button>  
+                            <button class="goBtn emojiBtn" onclick="controlInfo('new')">🖼️</button>
+                     
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- thumbs up emoji -->
+        <button id="closeInfo" class="emojiBtn">👍</button>
+    </section>
+    <div id="canvCont">
+        <canvas id="canvas"></canvas>
+        <div id="loadingOverlay">
+            <!-- <div id="spinner"></div> -->
+             <div id="loadingEmojis"><span id="painting">🖼️</span><div id="brush">🖌</div><span id="bot">🤖</span>
+                </div>
+        </div>
+    </div>
+    <section id="legendDisplay"></section>
+
+    <div id="controls">
+        <div id="inputs">
+            <!-- <div id="suggestions">
+                <span id="suggestion1" class="suggestion">Sug1</span>
+                <span id="suggestion2" class="suggestion">Sug2</span>
+                <span id="suggestion3" class="suggestion">Sug3</span>
+            </div> -->
+            <input type="text" id="input" placeholder="Describe a new image or load an existing one." autocomplete="off">
+        </div>
+        
+        <div id="ctrlRow">
+            <button id="model" class="emojiBtn" onclick="switchModel()">⚡</button>
+            <button id="saveImage" class="emojiBtn" onclick="saveImage()" class="button" disabled>💾</button>
+
+            <div id="undoBtns">
+                <button id="undoBtn" class="emojiBtn" onclick="undo()" disabled>⏪</button>
+                <button id="redoBtn" class="emojiBtn" onclick="redo()" disabled>⏩</button>
+            </div>
+
+            <button id="changeBtn" class="emojiBtn" onclick="go(true)" disabled>📝</button>  
+                
+            <button id="goBtn" class="emojiBtn" onclick="go()">🖼️</button>
+        </div>
+    </div>
+
+    <div id="toggles">
+        <div id="drawCharsLabel">
+            <h3>Show Labels</h3>
+                <!-- <input type="checkbox" name="drawChars" id="drawChars">
+                <span class="custom-checkbox"></span> -->
+                <label class="switch" for="drawChars">
+                    <input type="checkbox" name="drawChars" id="drawChars">
+                    <span class="slider"></span>
+                </label>
+        </div>
+
+        <div id="colourFilterLabel">
+            <h3>Colour Filter</h3>
+
+                <!-- <input type="checkbox" name="colourFilter" id="colourFilter" checked>
+                <span class="custom-checkbox"></span> -->
+                <label class="switch" for="colourFilter">
+                    <input type="checkbox" name="colourFilter" id="colourFilter" checked>
+                    <span class="slider"></span>
+                </label>
+        </div>
+    </div>
+    <select id="localImages"></select>
+
+    <button class="clearSaved red" onclick="clearSaved()">Clear Saved Images</button>
+
+    <!-- <label for="loadLocal">Load Local</label>
+    <input type="checkbox" id="loadLocal"> -->
+    <script>
+
+        // localStorage.clear();
+
+
+        const funny = {
+    "width": 400,
+    "height": 600,
+    "legend": {
+        "C": {
+            "name": "Skin Color",
+            "color": "#FFDAB9"
+        },
+        "H": {
+            "name": "Hair",
+            "color": "#654321"
+        },
+        "E": {
+            "name": "Eyes",
+            "color": "#0000FF"
+        },
+        "M": {
+            "name": "Mouth",
+            "color": "#FF5C5C"
+        },
+        "B": {
+            "name": "Background",
+            "color": "#FFFFFF"
+        }
+    },
+    "data": [
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBBBBBBBBBCCCCCBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBBBBBBBCCCCCCCCBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBBBBBBCCCCCCCCCBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBBBBBBCCCCCCCCCBBBBBBCBBBBBBBBBBCCBBBBBBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBBBBBCCCCCCCCCBBBBBBCCCCCCCCCBBBBBBCCCCBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBBBCCCCCCCCCBFFFFFFFFFFCCBBCCFFFFFFFFFBBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBCCCCCCCCCFEEEEEEEEEEEFFCFFFFFFFFEEEEEOBBBBBBBBBBBBBBBBBB",
+        "BBBBBBCCCFFFFFFFFEEEEMMMMMMMEEEBFFFEEEEEEMMMEEEFFFFFFFFBBBBBBBBB",
+        "BBBBBBCCFFFFFFFFEEEEMMMMMMMEEEBFFFFFFFFFFEMMMEEEEEEFFFFFFFFBBBBBB",
+        "BBBBBCCCCCCCFFFFFFFFFFFFFFFFFFCCFFFFFFFFCCCCFFFFFFFFFFFFFFBBBBBB",
+        "BBBBCCCCCFFFFFFFFFFFFFFFFFFFFFFCCCCCCCCCCCCCCCREAAAAAAAAAABBBBBB",
+        "BBBBCCCFFFFFFFFFFFFFFFFFFFFCCFFFFFFFFCCCCCCCCREAAAAAAAAABBBBBBB",
+        "BBCCCCCCFFFCCCCCCFFFFFFFFCCFFEEMMMMMMMEEEEECCEEEEEEEEEEEBBBBBB",
+        "BBCCCCCCCFCCCEEEEEEFFFFFFFFFEEEMMMMMMMEEEEEFEAFAFAFAEEBBBBBBBBB",
+        "BBBBBBCCCCCFFFFFFFFFFFFFFFFFCCEEEEMMMEEEFFFFFAFAFAFAFFFFAABBB",
+        "BBBBBBBBCCCCCFFFFFCCCCCCFFFFFCCCCEEMMMMMMMMMMMMMMMMMMBBBCCBB",
+        "BBBBBBBBBCFFFBCCCCCCCCCFFCFFFFFFFFFFFFFFFFFBBBBBBBBBBBBBB",
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+    ]
+};
+
+
+
+        const goBtn = document.getElementById('goBtn');
+        const changeBtn = document.getElementById('changeBtn');
+        const model = document.getElementById('model');
+        const saveImageBtn = document.getElementById('saveImage');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const inputElem = document.getElementById('input');
+        const localImages = document.getElementById('localImages');
+
+        let buttons = [goBtn, changeBtn, model, saveImageBtn, undoBtn, redoBtn, inputElem, localImages];
+
+        disableButtons(buttons);
+        enableButton(goBtn);
+        enableButton(model);
+        enableButton(inputElem);
+        enableButton(localImages);
+
+        const infoOverlay = document.getElementById('infoOverlay');
+        const infoContent = document.getElementById('infoContent');
+        const closeInfo = document.getElementById('closeInfo');
+
+        infoOverlay.addEventListener('click', function() {
+            if(event.target === infoOverlay) {
+                infoOverlay.style.display = 'none';
+                // document.body.style.overflowY = 'auto';
+            }
+        });
+
+        closeInfo.addEventListener('click', function() {
+            infoOverlay.style.display = 'none';
+            // document.body.style.overflowY = 'auto';
+        });
+        
+        function controlInfo(control) {
+            const infoContent = document.getElementById('infoContent');
+            const controlDesc = infoContent.querySelector('.controlDesc');
+            const model = document.querySelector('.model');
+            controlDesc.innerHTML = "";
+            switch(control) {
+                case 'model':
+                    toggleDisplayModel();
+                    break;
+                case 'modify':
+                    controlDesc.innerHTML = `
+                        <p>Write desired changes in the input box and click this button to modify the current image.</p>
+                    `;
+                    break;
+                case 'new':
+                    controlDesc.innerHTML = `
+                        <p>Generate a new image based on the description in the input box.</p>
+                    `;
+                    break;
+                case 'save':
+                    controlDesc.innerHTML = `
+                        <p>Save the current image to your local storage.</p>
+                    `;
+                    break;
+                case 'undo':
+                    controlDesc.innerHTML = `
+                        <p>Undo the last change made to the image.</p>
+                    `;
+                    break;
+                case 'redo':
+                    controlDesc.innerHTML = `
+                        <p>Redo the last change made to the image.</p>
+                    `;
+                    break;
+                default:
+                    controlDesc.innerHTML = `
+                        <p>Click a button to see its description.</p>
+                    `;
+            }
+            infoOverlay.style.display = 'flex';
+        }
+
+        function toggleDisplayModel() {
+            //toggle the .model innertext between the emoji - ⚡, 💪, 🧠
+            //and the controlDesc to show the model description
+            const model = document.querySelector('.model');
+            const controlDesc = infoContent.querySelector('.controlDesc');
+
+            if(model.innerText === "⚡") {
+                model.innerText = "💪";
+                controlDesc.innerHTML = `
+                    <p>Switches the AI model to GPT-4o - the balanced model with medium speed and high quality.</p>
+                `;
+            } else if(model.innerText === "💪") {
+                model.innerText = "🧠";
+                controlDesc.innerHTML = `
+                    <p>Switches the AI model to o1-mini - the highest quality model with the slowest speed.</p>
+                `;
+            } else {
+                model.innerText = "⚡";
+                controlDesc.innerHTML = `
+                    <p>Switches the AI model to GPT-4o-mini - the fastest model with the lowest quality.</p> 
+                `;
+            }
+        }
+
+        // let loadLocalEl = document.getElementById('loadLocal');
+
+        // loadLocalEl.addEventListener('change', function(){
+        //     // loadLocal = this.checked;
+        // });
+
+        let models = ["gpt-4o-mini", "gpt-4o", "o1-mini"];
+        let currModel = models[0];
+        // use emoji for each model: lightning, strong, brain
+        let modelDisplay = ["⚡", "💪", "🧠"];
+
+        let drawCharsEl = document.getElementById('drawChars');
+        drawCharsEl.addEventListener('change', function(){
+            drawChars = this.checked;
+            if(lastGrid) {
+                let og = JSON.parse(lastGrid);
+                drawGrid(og, og.width, og.height);
+            }
+        });
+        let drawChars = false;
+
+        let colourFilterEl = document.getElementById('colourFilter');
+        colourFilterEl.addEventListener('change', function(){
+            colourFilter = this.checked;
+            if(lastGrid) {
+                let og = JSON.parse(lastGrid);
+                drawGrid(og, og.width, og.height);
+            }
+        });
+
+        let images = {
+            messages: null,
+        };
+
+
+        let currentImage = null;
+
+        
+        let imageStates = [];
+        let currentStateIndex = -1;
+
+        function saveState(grid, prompt) {
+            // Remove any redo states
+            imageStates = imageStates.slice(0, currentStateIndex + 1);
+            // Add the new state
+            imageStates.push({ grid, prompt });
+            // Update the current state index
+            currentStateIndex++;
+            // Update the undo/redo buttons
+            updateUndoRedoButtons();
+        }
+
+        function disableButtons(buttons) {
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+        }
+
+        function enableButtons(buttons) {
+            buttons.forEach(button => {
+                button.disabled = false;
+            });
+        }
+
+        function enableButton(button) {
+            button.disabled = false;
+        }
+
+        function disableButton(button) {
+            button.disabled = true;
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = currentStateIndex <= 0;
+            redoBtn.disabled = currentStateIndex >= imageStates.length - 1;
+        }
+
+
+        function undo() {
+            if (currentStateIndex > 0) {
+                currentStateIndex--;
+                const { grid, prompt } = imageStates[currentStateIndex];
+                lastGrid = JSON.stringify(grid);
+                lastPrompt = prompt;
+                drawGrid(grid, grid.width, grid.height);
+                updateUndoRedoButtons();
+            }
+        }
+
+        function redo() {
+            if (currentStateIndex < imageStates.length - 1) {
+                currentStateIndex++;
+                const { grid, prompt } = imageStates[currentStateIndex];
+                lastGrid = JSON.stringify(grid);
+                lastPrompt = prompt;
+                drawGrid(grid, grid.width, grid.height);
+                updateUndoRedoButtons();
+            }
+        }
+
+
+        function clearSaved() {
+            if(confirm('Are you sure you want to clear all saved images?')) {
+                localStorage.clear();
+                savedGrids = [];
+                console.log('Local storage cleared.');
+                loadImages(images);
+            }
+        }
+
+        function loadImages(data) {
+            localImages.innerHTML = "";
+            images = data;
+
+            let r = images.concat(savedGrids);
+            // allImages = r;
+
+            for(let i = 0; i < r.length; i++){
+                let img = r[i];
+                let div = document.createElement('option');
+                div.innerHTML = img.find(m => m.role === "user").content;
+                div.value = i;
+                localImages.appendChild(div);
+            }
+            // currentImage = r[0];
+        }
+
+        let savedGrids = localStorage.getItem('savedGrids') ? JSON.parse(localStorage.getItem('savedGrids')) : [];
+        console.log(savedGrids);
+
+        //read from file
+        fetch('images.json')
+        .then(response => response.json())
+        .then(data => {
+            loadImages(data);
+            currentImage = images[2];
+            go(false, true);
+
+        });
+
+
+        localImages.addEventListener('change', function(){
+            currentImage = images[this.value] ? images[this.value] : savedGrids[this.value - images.length];
+            go(false, true);
+        });
+        
+
+        let chatObj = {
+            messages: [],
+            model: currModel,
+            response_format: {
+                "type": "json_object"
+            }
+        }
+
+        function resetMessages() {
+            fetch('messages.json')
+            .then(response => response.json())
+            .then(data => {
+                chatObj.messages = data;
+                // console.log(chatObj.messages);
+            });
+        }
+
+        resetMessages();
+
+        function saveImage() {
+            if (lastGrid) {
+                let obj = [
+                    {
+                        "role": "user",
+                        "content": lastPrompt
+                    },
+                    {
+                        "role": "assistant",
+                        "content": lastGrid
+                    }
+                ];
+                savedGrids.push(obj);
+                localStorage.setItem('savedGrids', JSON.stringify(savedGrids));
+                loadImages(images);
+
+                console.log('Grid saved to local storage.');
+            } else {
+                console.log('No grid to save.');
+            }
+        }
+
+        function switchModel() {
+            const model = document.getElementById('model');
+            const modelIndex = models.indexOf(currModel);
+            currModel = models[(modelIndex + 1) % models.length];
+            model.innerText = modelDisplay[(modelIndex + 1) % models.length];
+            chatObj.model = currModel;
+        }
+
+        const chatUrl = '/.netlify/functions/netlify-chat';
+
+        async function fetchGrid() {
+            const response = await fetch(chatUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(chatObj)
+            });
+            return await response.json();
+        }
+
+        function hexToRGB(hex) {
+            const bigint = parseInt(hex, 16);
+            return {
+                r: (bigint >> 16) & 255,
+                g: (bigint >> 8) & 255,
+                b: bigint & 255
+            };
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+        
+        function tapOrHover(element, callback) {
+            element.addEventListener('touchstart', () => {
+                callback(true);
+            });
+            element.addEventListener('touchend', () => {
+                callback(false);
+            });
+            element.addEventListener('mouseover', () => {
+                callback(true);
+            });
+            element.addEventListener('mouseout', () => {
+                callback(false);
+            });
+        }
+
+
+        function drawGrid(grid, width, height) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate the canvas size based on grid size
+            const tileSize = 40;
+            canvas.width = width * tileSize;
+            canvas.height = height * tileSize;
+
+            //The legend
+            const legendRes = grid.legend;
+            const legend = {};
+            legendRes.forEach((entry) => {
+                legend[entry.char] = entry;
+            });
+            // console.log(legend);
+
+            function varyColor(color) {
+                if(!colourFilter) {
+                    return color;
+                }
+                const amount = 20; // Amount to vary the color by
+                let colorInt = parseInt(color.slice(1), 16);
+                let r = (colorInt >> 16) + Math.floor(Math.random() * amount - amount / 2);
+                let g = ((colorInt >> 8) & 0x00FF) + Math.floor(Math.random() * amount - amount / 2);
+                let b = (colorInt & 0x0000FF) + Math.floor(Math.random() * amount - amount / 2);
+                r = Math.max(Math.min(255, r), 0);
+                g = Math.max(Math.min(255, g), 0);
+                b = Math.max(Math.min(255, b), 0);
+                return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+            }
+
+            // Draw each tile
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const tile = grid.data[y][x];
+                    const color = legend[tile] ? varyColor(legend[tile].color) : getRandomColor();
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+
+                    if (legend[tile] && drawChars) {
+                        ctx.fillStyle = '#000000'; // Set text color to black
+                        ctx.font = '20px Arial'; // Set font size and family
+                        ctx.textAlign = 'center'; // Center the text horizontally
+                        ctx.textBaseline = 'middle'; // Center the text vertically
+                        ctx.fillText(tile, x * tileSize + tileSize / 2, y * tileSize + tileSize / 2);
+                    }
+                }
+            }
+
+            const legendDisplay = document.getElementById('legendDisplay');
+            legendDisplay.innerHTML = "";
+            for (let key in legend) {
+                const tile = legend[key];
+                const color = tile.color;
+                const name = tile.name;
+                const div = document.createElement('div');
+                div.className = 'legend-item';
+                div.innerHTML = `
+                    <div class="lg-color":${color};" style="background-color:${color};"></div>
+                    <span class="lg-name">${name}</span>
+                `;
+                div.highlighted = false;
+                div.addEventListener('mouseover', () => {
+                
+                    //highlight the tiles of the same type on the canvas if div.highlighted is false, remove the highlight if div.highlighted is true
+
+                    if (div.highlighted) {
+                        drawGrid(grid, width, height);
+                    }
+                    else {
+
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            const tile = grid.data[y][x];
+                            if (tile != key) {
+                                //put a half transparent rectangle on top of the tile
+                                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    
+
+                                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                            }
+                        }
+                    }}
+                    div.highlighted = !div.highlighted;
+                });
+                div.addEventListener('mouseout', () => {
+                    drawGrid(grid, width, height);
+                });
+                legendDisplay.appendChild(div);
+            }
+
+        }
+
+        function parseGrid(grid) {
+            // console.log(grid);
+            const tiles = [];
+            const gridData = grid.data;
+
+            return { tiles, gridData };
+        }
+
+        let lastGrid = "";
+        let lastPrompt = "";
+
+        inputElem.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                go();
+            }
+        });
+
+        inputElem.addEventListener('input', function() {
+            if (inputElem.value) {
+                enableButton(goBtn);
+                enableButton(changeBtn);
+            } else {
+                disableButton(goBtn);
+                disableButton(changeBtn);
+            }
+        });
+
+
+        async function go(isFollowup = false, loadLocal = false) {
+            //smooth scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // chatObj.messages = [
+            //         {
+            //             "role": "system",
+            //             "content": "Generate an image with a grid of 10x10 tiles using the following JSON formatting. Think of it like doing pixel art or a paint by numbers, with a 2d array of tiles. Remember only one color can exist at each grid location so don't overlap them in your design. The grid should be visually appealing and interesting to explore. The tiles should be generated in a way that makes sense for the image you are creating. The image should be generated based on the user's request. Each tile is represented by a letter from legend. The data array contains the grid data, where each row is an array of tiles. The legend each letter to a color and name for the tile. The legend should be modified to reflect the palette for the image, whatever that may be. The position and type of tiles should be intentional based on the requested output. E.g 'a map of a desert island with water surrounding it', or 'landscape image of a mountain range in the middle of a grassy plain' or 'portrait of a man'. The image should be visually appealing and interesting. User requests may not always be for an image with the same legend or tileset. The assistant should be able to generate an grid-image based on the user's request. The exact JSON format should always be followed, but the content of the image must be adjusted based on the user's request. The height and width parameters must be followed. Your response should be exactly formatted JSON with no leading or trailing characters or spaces. Do not include any additional information in the response. Start your response with { and end it with }. The JSON format should be as follows:"
+            //         },
+            //         {
+            //             "role": "user",
+            //             "content": "Generate a 10x10 map of a volcano on an island"
+            //         },
+            //         {
+            //             "role": "assistant",
+            //             "content": "{\"width\":10,\"height\":10,\"data\":[[\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\"],[\"W\",\"F\",\"F\",\"R\",\"R\",\"F\",\"F\",\"F\",\"S\",\"W\"],[\"W\",\"F\",\"R\",\"R\",\"R\",\"R\",\"F\",\"F\",\"S\",\"W\"],[\"W\",\"R\",\"R\",\"R\",\"L\",\"R\",\"R\",\"F\",\"S\",\"W\"],[\"W\",\"R\",\"R\",\"L\",\"L\",\"L\",\"R\",\"F\",\"S\",\"W\"],[\"W\",\"R\",\"F\",\"L\",\"L\",\"L\",\"R\",\"F\",\"S\",\"W\"],[\"W\",\"F\",\"F\",\"R\",\"R\",\"F\",\"F\",\"F\",\"S\",\"W\"],[\"W\",\"F\",\"F\",\"F\",\"F\",\"F\",\"F\",\"S\",\"S\",\"W\"],[\"W\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"W\"],[\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\"]],\"legend\":[{\"char\":\"W\",\"name\":\"Water\",\"color\":\"#0000FF\"},{\"char\":\"S\",\"name\":\"Sand\",\"color\":\"#FFFF00\"},{\"char\":\"F\",\"name\":\"Forest\",\"color\":\"#228B22\"},{\"char\":\"R\",\"name\":\"Rubble\",\"color\":\"#885522\"},{\"char\":\"L\",\"name\":\"Lava\",\"color\":\"#FF5733\"}]}"
+            //         }
+            //     ];
+            let input = inputElem.value;
+
+
+            if (!input && !loadLocal) {
+                inputElem.focus();
+                return;
+                // input = "Generate a map of a desert island with water surrounding it.";
+            }
+
+            inputElem.value = "";
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+
+            resetMessages();
+            if(isFollowup) {
+                chatObj.messages.push({
+                    "role": "system",
+                    "content":
+                        `Attention: You are modifying an existing image. The user is requesting changes to the image. The requested changes will be in the following user message. Examine it in its current state, and return an improved version following the prompt. You can keep or replace any tiles as deemed necessary to achieve the desired image: ${lastGrid}`
+                });
+
+                if(chatObj.model != "o1-mini") {
+                    // Capture the current canvas as a base64 encoded image
+                    const canvas = document.getElementById('canvas');
+                    const base64Image = canvas.toDataURL("image/jpeg").split(',')[1]; // Get base64 part
+
+                    chatObj.messages.push({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "The current image is as follows:"
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": `data:image/jpeg;base64,${base64Image}`,
+                                    "detail": "low"
+                                }
+                            }
+                        ]
+                    });
+                }
+            }
+
+            chatObj.messages.push({
+                    "role": "user",
+                    "content": input
+                });
+
+            chatObj.model = currModel;
+            if(chatObj.model != "o1-mini") {
+                chatObj.response_format = {
+                    type: "json_schema",
+                    json_schema: {
+                        name: "img_response",
+                        schema: {
+                            type: "object",
+                            properties: {
+                                width: { type: "number" },
+                                height: { type: "number" },
+                                data: {
+                                    type: "array",
+                                    items: {
+                                        type: "array",
+                                        items: { type: "string" }
+                                    }
+                                },
+                                legend: {
+                                    type: "array",
+                                    items: {
+                                        type: "object",
+                                        properties: {
+                                            char: { type: "string" },
+                                            name: { type: "string" },
+                                            color: { type: "string" }
+                                        },
+                                        required: ["name", "color", "char"],
+                                        additionalProperties: false
+                                    }
+                                }
+                            },
+                            required: ["width", "height","legend", "data"],
+                            additionalProperties: false
+                        },
+                        strict: true
+                    }
+                };
+            } else {
+                chatObj.response_format = null;
+            }
+            if(chatObj.model === "o1-mini") {
+                chatObj.messages.forEach(m => m.role = m.role === "system" ? "assistant" : m.role);
+            }
+
+            disableButtons(buttons);
+            goBtn.innerText = "⏳";
+
+            let res;
+            // console.log(loadLocal);
+            if(loadLocal){
+                console.log("loading local");
+                res = currentImage;
+            } else {
+                try {
+                    res = await fetchGrid();
+                } catch (error) {
+                    console.error("Failed to fetch grid:", error);
+                    alert("There was an error generating the image. Please try again.");
+                    loadingOverlay.style.display = 'none';
+                    goBtn.innerText = "🖼️";
+                    enableButtons(buttons);
+                    updateUndoRedoButtons();
+                    return;
+                }
+            }
+
+            let grid;
+            try {
+                if(loadLocal){
+                    console.log(res);
+                    grid = JSON.parse(res[res.length - 1].content);
+                    lastGrid = res[res.length - 1].content;
+                    lastPrompt = res[res.length - 2].content;
+                } else {
+                    grid = JSON.parse(res.choices[0].message.content);
+                    lastGrid = res.choices[0].message.content;
+                    lastPrompt = input;
+                }
+                
+            } catch (error) {
+                console.error("Failed to parse JSON response:", error);
+
+                // Find the string ```json in the response, remove it and try parsing again
+                const content = res.choices[0].message.content;
+                const cleanedContent = content.replace(/```json/g, '').replace(/```/g, '');
+                try {
+                    // console.log(cleanedContent);
+                    grid = JSON.parse(cleanedContent);
+                    lastGrid = cleanedContent;
+                } catch (innerError) {
+                    console.error("Failed to parse JSON response:", innerError);
+                    alert("There was an error processing the image data. Please try again.");
+                    // lastGrid = lastGrid === "" ? response : lastGrid;
+                    loadingOverlay.style.display = 'none';
+                    return;
+                }
+            }
+            goBtn.innerText = "🖼️";
+            enableButtons(buttons);
+            
+            inputElem.placeholder = "Describe a new image or image adjustments";
+
+
+            // console.log(grid);
+            parseGrid(grid);
+            // console.log(grid);
+
+            drawGrid(grid, grid.width, grid.height);
+
+            saveState(grid, input);
+
+            loadingOverlay.style.display = 'none';
+
+        }
+
+        // (async function() {
+        //     const grid = await fetchGrid();
+        //     drawGrid(grid);
+        // })();
+    </script>
+</body>
+</html>
