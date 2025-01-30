@@ -999,14 +999,35 @@
         const chatUrl = '/.netlify/functions/netlify-chat';
 
         async function fetchGrid() {
-            const response = await fetch(chatUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(chatObj)
-            });
-            return await response.json();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+        
+            try {
+                const response = await fetch(chatUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(chatObj),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                return await response.json();
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Request timed out');
+                } else if (error.message.includes('502')) {
+                    console.error('Bad Gateway: The server is down or being upgraded.');
+                } else {
+                    console.error('Error fetching data:', error);
+                }
+                throw error;
+            }
         }
 
         function hexToRGB(hex) {
