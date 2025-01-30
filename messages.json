@@ -2,5 +2,53 @@
     {
         "role": "system",
         "content": "Generate an image with a grid of 10x10 tiles using the following JSON formatting. Think of it like doing pixel art or a paint by numbers, with a 2d array of tiles. Remember only one color can exist at each grid location so don't overlap them in your design. You cannot use empty characters or characters not included in legend. The grid should be visually appealing and interesting to explore. The tiles should be generated in a way that makes sense for the image you are creating. The image should be generated based on the user's request. Each tile is represented by a letter from legend. The data array contains the grid data, where each row is an array of tiles. The legend maps each letter to a color and name for the tile. The legend should be modified to reflect the palette for the image, whatever that may be. The position and type of tiles should be intentional based on the requested output. E.g 'a map of a desert island with water surrounding it', or 'landscape image of a mountain range in the middle of a grassy plain' or 'portrait of a man'. The image should be visually appealing and interesting. User requests may not always be for an image with the same legend or tileset. The assistant should be able to generate an grid-image based on the user's request. The exact JSON format should always be followed, but the content of the image must be adjusted based on the user's request. The height and width parameters must be followed. Your response should be exactly formatted JSON with no leading or trailing characters or spaces. Do not include any additional information in the response. Start your response with { and end it with }. The JSON format should be as follows:"
+    },
+    {
+        "role": "user",
+        "content": "Generate a 10x10 map of a volcano"
+    },
+    {
+        "role": "assistant",
+        "content": "{ \"width\": 10, \"height\": 10, \"legend\": [ { \"char\": \"L\", \"name\": \"Lava\", \"color\": \"#FF5733\" }, { \"char\": \"R\", \"name\": \"Rubble\", \"color\": \"#885522\" }, { \"char\": \"F\", \"name\": \"Forest\", \"color\": \"#228B22\" } ], \"data\": [ [\"L\", \"L\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"L\", \"L\"], [\"F\", \"F\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"F\", \"F\"], [\"L\", \"L\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"L\", \"L\"], [\"F\", \"F\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"F\", \"F\"], [\"L\", \"L\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"L\", \"L\"], [\"F\", \"F\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"F\", \"F\"], [\"L\", \"L\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"L\", \"L\"], [\"F\", \"F\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"F\", \"F\"], [\"L\", \"L\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"L\", \"L\"], [\"F\", \"F\", \"R\", \"R\", \"F\", \"F\", \"R\", \"R\", \"F\", \"F\"] ] }"
+    },
+    {
+        "role": "user",
+        "content": "Generate a 10x10 map of a volcano on an island"
+    },
+    {
+        "role": "assistant",
+        "content": "{\"width\":10,\"height\":10,\"data\":[[\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\"],[\"W\",\"F\",\"F\",\"R\",\"R\",\"F\",\"F\",\"F\",\"S\",\"W\"],[\"W\",\"F\",\"R\",\"R\",\"R\",\"R\",\"F\",\"F\",\"S\",\"W\"],[\"W\",\"R\",\"R\",\"R\",\"L\",\"R\",\"R\",\"F\",\"S\",\"W\"],[\"W\",\"R\",\"R\",\"L\",\"L\",\"L\",\"R\",\"F\",\"S\",\"W\"],[\"W\",\"R\",\"F\",\"L\",\"L\",\"L\",\"R\",\"F\",\"S\",\"W\"],[\"W\",\"F\",\"F\",\"R\",\"R\",\"F\",\"F\",\"F\",\"S\",\"W\"],[\"W\",\"F\",\"F\",\"F\",\"F\",\"F\",\"F\",\"S\",\"S\",\"W\"],[\"W\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"W\"],[\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\",\"W\"]],\"legend\":[{\"char\":\"W\",\"name\":\"Water\",\"color\":\"#0000FF\"},{\"char\":\"S\",\"name\":\"Sand\",\"color\":\"#FFFF00\"},{\"char\":\"F\",\"name\":\"Forest\",\"color\":\"#228B22\"},{\"char\":\"R\",\"name\":\"Rubble\",\"color\":\"#885522\"},{\"char\":\"L\",\"name\":\"Lava\",\"color\":\"#FF5733\"}]}"
+    },
+    {
+        "role": "user",
+        "content": "Generate a 10x10 portrait of a man"
+    },
+    {
+        "role": "assistant",
+        "content": "{\"width\":10,\"height\":10,\"legend\":[{\"char\":\"H\",\"name\":\"Hair\",\"color\":\"#333333\"},{\"char\":\"S\",\"name\":\"Skin\",\"color\":\"#FFCC99\"},{\"char\":\"E\",\"name\":\"Eyes\",\"color\":\"#000000\"},{\"char\":\"M\",\"name\":\"Mouth\",\"color\":\"#CC3333\"},{\"char\":\"C\",\"name\":\"Clothes\",\"color\":\"#3366FF\"}],\"data\":[[\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\"],[\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\",\"H\"],[\"H\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"H\",\"H\"],[\"H\",\"S\",\"E\",\"S\",\"S\",\"S\",\"E\",\"S\",\"S\",\"H\"],[\"H\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"H\"],[\"H\",\"S\",\"S\",\"M\",\"M\",\"M\",\"S\",\"S\",\"S\",\"H\"],[\"H\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"S\",\"H\"],[\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\"],[\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\"],[\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\",\"C\"]]}"
+    },
+    {
+        "role": "user",
+        "content": "a sunset over the ocean"
+    },
+    {
+        "role": "assistant",
+        "content": "{ \"width\": 10, \"height\": 10, \"data\": [ [ \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\" ], [ \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\" ], [ \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\" ], [ \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"Y\", \"Y\", \"Y\", \"S\" ], [ \"S\", \"S\", \"S\", \"S\", \"S\", \"Y\", \"Y\", \"Y\", \"Y\", \"S\" ], [ \"S\", \"S\", \"S\", \"S\", \"Y\", \"Y\", \"Y\", \"Y\", \"Y\", \"S\" ], [ \"W\", \"W\", \"W\", \"W\", \"Y\", \"Y\", \"Y\", \"Y\", \"Y\", \"W\" ], [ \"W\", \"W\", \"W\", \"W\", \"W\", \"Y\", \"Y\", \"Y\", \"W\", \"W\" ], [ \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\" ], [ \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\" ] ], \"legend\": [ { \"char\": \"W\", \"name\": \"Water\", \"color\": \"#0000FF\" }, { \"char\": \"S\", \"name\": \"Sky\", \"color\": \"#87CEEB\" }, { \"char\": \"Y\", \"name\": \"Sun\", \"color\": \"#FFD700\" } ] }"
+    },
+    {
+        "role": "user",
+        "content": "Generate a map of a desert island with water surrounding it."
+    },
+    {
+        "role": "assistant",
+        "content": "{ \"width\": 10, \"height\": 10, \"data\": [ [ \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\" ], [ \"W\", \"W\", \"S\", \"S\", \"S\", \"S\", \"S\", \"W\", \"W\", \"W\" ], [ \"W\", \"S\", \"S\", \"C\", \"S\", \"C\", \"S\", \"S\", \"S\", \"W\" ], [ \"W\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"C\", \"S\", \"W\" ], [ \"W\", \"S\", \"S\", \"S\", \"S\", \"C\", \"S\", \"S\", \"S\", \"W\" ], [ \"W\", \"S\", \"S\", \"C\", \"S\", \"S\", \"S\", \"S\", \"S\", \"W\" ], [ \"W\", \"S\", \"S\", \"S\", \"S\", \"S\", \"C\", \"C\", \"S\", \"W\" ], [ \"W\", \"S\", \"S\", \"S\", \"C\", \"C\", \"C\", \"S\", \"S\", \"W\" ], [ \"W\", \"W\", \"S\", \"S\", \"S\", \"S\", \"S\", \"S\", \"W\", \"W\" ], [ \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\", \"W\" ] ], \"legend\": [ { \"char\": \"W\", \"name\": \"Water\", \"color\": \"#0000FF\" }, { \"char\": \"S\", \"name\": \"Sand\", \"color\": \"#FFD700\" }, { \"char\": \"C\", \"name\": \"Coconut Trees\", \"color\": \"#228B22\" } ] }"
+    },
+    {
+        "role": "user",
+        "content": "an 8x8 minecraft creeper face"
+    },
+    {
+        "role": "assistant",
+        "content": "{ \"width\": 8, \"height\": 8, \"data\": [ [ \"G\", \"G\", \"G\", \"G\", \"G\", \"G\", \"G\", \"G\" ], [ \"G\", \"G\", \"G\", \"G\", \"G\", \"G\", \"G\", \"G\" ], [ \"G\", \"B\", \"B\", \"G\", \"G\", \"B\", \"B\", \"G\" ], [ \"G\", \"B\", \"B\", \"G\", \"G\", \"B\", \"B\", \"G\" ], [ \"G\", \"G\", \"G\", \"B\", \"B\", \"G\", \"G\", \"G\" ], [ \"G\", \"G\", \"B\", \"B\", \"B\", \"B\", \"G\", \"G\" ], [ \"G\", \"G\", \"B\", \"B\", \"B\", \"B\", \"G\", \"G\" ], [ \"G\", \"G\", \"B\", \"G\", \"G\", \"B\", \"G\", \"G\" ] ], \"legend\": [ { \"char\": \"G\", \"name\": \"Skin\", \"color\": \"#00FF00\" }, { \"char\": \"B\", \"name\": \"Face\", \"color\": \"#000000\" } ] }"
     }
 ]
